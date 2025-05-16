@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GPS Sender</title>
+</head>
+<body>
+  <h1> Envoi GPS vers Unity</h1>
+  <p id="status">Connexion...</p>
+  <p id="location">Aucune position encore.</p>
+
+  <script>
+    const status = document.getElementById("status");
+    const locationDisplay = document.getElementById("location");
+
+    const socket = new WebSocket("ws://192.168.1.123:8080"); // ⬅️ remplace par l’IP locale de ton PC
+
+    socket.onopen = () => {
+      status.textContent = "Connecté au WebSocket";
+    };
+
+    socket.onerror = (err) => {
+      status.textContent = "Erreur WebSocket";
+      console.error(err);
+    };
+
+    socket.onclose = () => {
+      status.textContent = "Connexion fermée";
+    };
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.watchPosition(position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        const data = {
+          type: "gps",
+          lat: lat,
+          lon: lon,
+          timestamp: Date.now()
+        };
+
+        locationDisplay.textContent = `Lat: ${lat.toFixed(6)} | Lon: ${lon.toFixed(6)}`;
+
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify(data));
+        }
+      }, error => {
+        locationDisplay.textContent = "Erreur GPS : " + error.message;
+      }, {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 5000
+      });
+    } else {
+      locationDisplay.textContent = "GPS non disponible";
+    }
+  </script>
+</body>
+</html>
