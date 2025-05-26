@@ -12,7 +12,7 @@
     const status = document.getElementById("status");
     const locationDisplay = document.getElementById("location");
 
-    const socket = new WebSocket("wss://73e9-193-205-81-5.ngrok-free.app"); // ⬅️ remplace par l’IP locale de ton PC
+    const socket = new WebSocket("wss://"); // ⬅️ remplace par l’IP locale de ton PC
 
     socket.onopen = () => {
       status.textContent = "Connecté au WebSocket";
